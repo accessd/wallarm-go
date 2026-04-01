@@ -31,6 +31,7 @@ type (
 	API interface {
 		Action
 		Application
+		Attack
 		IPList
 		Allowlist
 		Graylist
