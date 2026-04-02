@@ -6,6 +6,10 @@ type (
 	Attack interface {
 		AttackRead(body *AttackReadRequest) (*AttackReadResp, error)
 		AttackCount(body *AttackCountRequest) (*AttackCountResp, error)
+		AttackIP(body *AttackIPRequest) (*AttackIPResp, error)
+		HitRead(body *HitReadRequest) (*HitReadResp, error)
+		HitDetails(body *HitDetailsRequest) (*HitDetailsResp, error)
+		HitRaw(body *HitRawRequest) ([]byte, error)
 	}
 
 	AttackReadRequest struct {
@@ -23,9 +27,11 @@ type (
 		NotType         []string        `json:"!type,omitempty"`
 		Domain          []string        `json:"domain,omitempty"`
 		Path            []string        `json:"path,omitempty"`
+		Parameter       []string        `json:"parameter,omitempty"`
 		PoolID          []int           `json:"poolid,omitempty"`
 		IP              []string        `json:"ip,omitempty"`
-		AttackID        []string        `json:"attackid,omitempty"`
+		AttackID        interface{}     `json:"attackid,omitempty"`
+		RequestID       []string        `json:"request_id,omitempty"`
 		VulnID          []int           `json:"vulnid,omitempty"`
 		NotVulnID       interface{}     `json:"!vulnid,omitempty"`
 		Experimental    *bool           `json:"experimental,omitempty"`
@@ -86,7 +92,12 @@ type (
 	AttackCountFilter struct {
 		ClientID   []int           `json:"clientid,omitempty"`
 		Time       [][]interface{} `json:"time,omitempty"`
-		AttackID   []string        `json:"attackid,omitempty"`
+		Domain     []string        `json:"domain,omitempty"`
+		Path       []string        `json:"path,omitempty"`
+		Parameter  []string        `json:"parameter,omitempty"`
+		Type       []string        `json:"type,omitempty"`
+		RequestID  []string        `json:"request_id,omitempty"`
+		AttackID   interface{}     `json:"attackid,omitempty"`
 		StatusCode []int           `json:"statuscode,omitempty"`
 		IP         []string        `json:"ip,omitempty"`
 		ID         []string        `json:"id,omitempty"`
@@ -99,6 +110,76 @@ type (
 			Hits    float64 `json:"hits"`
 			IPs     int     `json:"ips"`
 		} `json:"body"`
+	}
+
+	AttackIPRequest struct {
+		Filter *AttackCountFilter `json:"filter"`
+	}
+
+	AttackIPResp struct {
+		Status int      `json:"status"`
+		Body   []string `json:"body"`
+	}
+
+	HitReadRequest struct {
+		Filter    interface{} `json:"filter"`
+		Limit     int         `json:"limit,omitempty"`
+		Offset    int         `json:"offset,omitempty"`
+		OrderBy   string      `json:"order_by,omitempty"`
+		OrderDesc bool        `json:"order_desc,omitempty"`
+	}
+
+	HitFilter struct {
+		ClientID    []int       `json:"clientid,omitempty"`
+		AttackID    interface{} `json:"attackid,omitempty"`
+		BlockStatus interface{} `json:"block_status,omitempty"`
+		ID          []string    `json:"id,omitempty"`
+	}
+
+	HitBody struct {
+		ID            []string `json:"id"`
+		AttackID      []string `json:"attackid"`
+		Type          string   `json:"type"`
+		IP            string   `json:"ip"`
+		StatusCode    *int     `json:"statuscode"`
+		Time          int      `json:"time"`
+		Value         string   `json:"value"`
+		RemoteCountry *string  `json:"remote_country"`
+		BlockStatus   *string  `json:"block_status"`
+		RequestID     string   `json:"request_id"`
+		Path          string   `json:"path"`
+		Domain        string   `json:"domain"`
+	}
+
+	HitReadResp struct {
+		Status int       `json:"status"`
+		Body   []HitBody `json:"body"`
+	}
+
+	HitDetailsRequest struct {
+		Filter  *HitFilter `json:"filter"`
+		Returns string     `json:"returns,omitempty"`
+	}
+
+	HitDetailsResp struct {
+		Status int              `json:"status"`
+		Body   []HitDetailsBody `json:"body"`
+	}
+
+	HitDetailsBody struct {
+		ID  []string     `json:"id"`
+		Raw HitRawDetail `json:"raw"`
+	}
+
+	HitRawDetail struct {
+		Method  string                 `json:"method"`
+		URI     string                 `json:"uri"`
+		Proto   string                 `json:"proto"`
+		Headers map[string]interface{} `json:"headers"`
+	}
+
+	HitRawRequest struct {
+		Filter *HitFilter `json:"filter"`
 	}
 )
 
@@ -126,4 +207,48 @@ func (api *api) AttackCount(body *AttackCountRequest) (*AttackCountResp, error) 
 		return nil, err
 	}
 	return &resp, nil
+}
+
+func (api *api) AttackIP(body *AttackIPRequest) (*AttackIPResp, error) {
+	uri := "/v1/objects/attack/ip"
+	respBody, err := api.makeRequest("POST", uri, "attack", body)
+	if err != nil {
+		return nil, err
+	}
+	var resp AttackIPResp
+	if err = json.Unmarshal(respBody, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+func (api *api) HitRead(body *HitReadRequest) (*HitReadResp, error) {
+	uri := "/v1/objects/hit"
+	respBody, err := api.makeRequest("POST", uri, "attack", body)
+	if err != nil {
+		return nil, err
+	}
+	var resp HitReadResp
+	if err = json.Unmarshal(respBody, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+func (api *api) HitDetails(body *HitDetailsRequest) (*HitDetailsResp, error) {
+	uri := "/v1/objects/hit/details"
+	respBody, err := api.makeRequest("POST", uri, "attack", body)
+	if err != nil {
+		return nil, err
+	}
+	var resp HitDetailsResp
+	if err = json.Unmarshal(respBody, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+func (api *api) HitRaw(body *HitRawRequest) ([]byte, error) {
+	uri := "/v1/objects/hit/raw"
+	return api.makeRequest("POST", uri, "attack", body)
 }

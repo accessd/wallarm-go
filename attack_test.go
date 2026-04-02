@@ -77,6 +77,49 @@ const attackCountResponseJSON = `{
   }
 }`
 
+const attackIPResponseJSON = `{
+  "status": 200,
+  "body": ["11.22.33.44", "11.22.33.45"]
+}`
+
+const hitResponseJSON = `{
+  "status": 200,
+  "body": [
+    {
+      "id": ["hits_test_130_202604_v_1", "Vr0ix9J6f5Wgk3dS"],
+      "attackid": ["attacks_test_130_202604_v_1", "3z5nB4P16C7u8Q"],
+      "type": "sqli",
+      "ip": "11.22.33.45",
+      "statuscode": 403,
+      "time": 1743531300,
+      "value": "' UNION SELECT password FROM users --",
+      "remote_country": "US",
+      "block_status": "blocked",
+      "request_id": "core-2252-login",
+      "path": "/api/v1/login",
+      "domain": "shop.example.com"
+    }
+  ]
+}`
+
+const hitDetailsResponseJSON = `{
+  "status": 200,
+  "body": [
+    {
+      "id": ["hits_test_130_202604_v_1", "Vr0ix9J6f5Wgk3dS"],
+      "raw": {
+        "method": "POST",
+        "uri": "/api/v1/login",
+        "proto": "HTTP/1.1",
+        "headers": {
+          "host": ["shop.example.com"],
+          "content-length": 123
+        }
+      }
+    }
+  ]
+}`
+
 func TestAttackRead(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/v1/objects/attack", func(w http.ResponseWriter, r *http.Request) {
@@ -171,4 +214,159 @@ func TestAttackCount(t *testing.T) {
 	assert.Equal(t, 621, resp.Body.Attacks)
 	assert.Equal(t, 61818.0, resp.Body.Hits)
 	assert.Equal(t, 16, resp.Body.IPs)
+}
+
+func TestAttackIP(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/v1/objects/attack/ip", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		var req AttackIPRequest
+		err := json.NewDecoder(r.Body).Decode(&req)
+		require.NoError(t, err)
+		assert.Equal(t, []int{130}, req.Filter.ClientID)
+		assert.Equal(t, []string{"11.22.33.44"}, req.Filter.IP)
+
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(attackIPResponseJSON))
+	})
+
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	client, err := New(
+		UsingBaseURL(server.URL),
+		Headers(http.Header{"X-WallarmAPI-Token": []string{"test-token"}}),
+	)
+	require.NoError(t, err)
+
+	resp, err := client.AttackIP(&AttackIPRequest{
+		Filter: &AttackCountFilter{
+			ClientID: []int{130},
+			IP:       []string{"11.22.33.44"},
+		},
+	})
+	require.NoError(t, err)
+
+	assert.Equal(t, 200, resp.Status)
+	assert.Equal(t, []string{"11.22.33.44", "11.22.33.45"}, resp.Body)
+}
+
+func TestHitRead(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/v1/objects/hit", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		var req map[string]interface{}
+		err := json.NewDecoder(r.Body).Decode(&req)
+		require.NoError(t, err)
+		assert.Equal(t, float64(3), req["limit"])
+		assert.Equal(t, "time", req["order_by"])
+		assert.Equal(t, true, req["order_desc"])
+
+		filter := req["filter"].(map[string]interface{})
+		attackIDs := filter["attackid"].([]interface{})
+		firstTuple := attackIDs[0].([]interface{})
+		assert.Equal(t, "attacks_test_130_202604_v_1", firstTuple[0])
+		assert.Equal(t, "3z5nB4P16C7u8Q", firstTuple[1])
+
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(hitResponseJSON))
+	})
+
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	client, err := New(
+		UsingBaseURL(server.URL),
+		Headers(http.Header{"X-WallarmAPI-Token": []string{"test-token"}}),
+	)
+	require.NoError(t, err)
+
+	resp, err := client.HitRead(&HitReadRequest{
+		Filter: HitFilter{
+			ClientID: []int{130},
+			AttackID: [][]string{{"attacks_test_130_202604_v_1", "3z5nB4P16C7u8Q"}},
+		},
+		Limit:     3,
+		OrderBy:   "time",
+		OrderDesc: true,
+	})
+	require.NoError(t, err)
+
+	assert.Equal(t, 200, resp.Status)
+	require.Len(t, resp.Body, 1)
+	assert.Equal(t, []string{"hits_test_130_202604_v_1", "Vr0ix9J6f5Wgk3dS"}, resp.Body[0].ID)
+	assert.Equal(t, "11.22.33.45", resp.Body[0].IP)
+	if assert.NotNil(t, resp.Body[0].StatusCode) {
+		assert.Equal(t, 403, *resp.Body[0].StatusCode)
+	}
+}
+
+func TestHitDetails(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/v1/objects/hit/details", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		var req HitDetailsRequest
+		err := json.NewDecoder(r.Body).Decode(&req)
+		require.NoError(t, err)
+		assert.Equal(t, []string{"hits_test_130_202604_v_1", "Vr0ix9J6f5Wgk3dS"}, req.Filter.ID)
+		assert.Equal(t, "raw", req.Returns)
+
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(hitDetailsResponseJSON))
+	})
+
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	client, err := New(
+		UsingBaseURL(server.URL),
+		Headers(http.Header{"X-WallarmAPI-Token": []string{"test-token"}}),
+	)
+	require.NoError(t, err)
+
+	resp, err := client.HitDetails(&HitDetailsRequest{
+		Filter:  &HitFilter{ID: []string{"hits_test_130_202604_v_1", "Vr0ix9J6f5Wgk3dS"}},
+		Returns: "raw",
+	})
+	require.NoError(t, err)
+
+	assert.Equal(t, 200, resp.Status)
+	require.Len(t, resp.Body, 1)
+	assert.Equal(t, "POST", resp.Body[0].Raw.Method)
+	assert.Equal(t, "/api/v1/login", resp.Body[0].Raw.URI)
+	assert.Equal(t, "HTTP/1.1", resp.Body[0].Raw.Proto)
+}
+
+func TestHitRaw(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/v1/objects/hit/raw", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		var req HitRawRequest
+		err := json.NewDecoder(r.Body).Decode(&req)
+		require.NoError(t, err)
+		assert.Equal(t, []string{"hits_test_130_202604_v_1", "Vr0ix9J6f5Wgk3dS"}, req.Filter.ID)
+
+		w.Header().Set("Content-Type", "application/octet-stream")
+		_, _ = w.Write([]byte("raw-hit-payload"))
+	})
+
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	client, err := New(
+		UsingBaseURL(server.URL),
+		Headers(http.Header{"X-WallarmAPI-Token": []string{"test-token"}}),
+	)
+	require.NoError(t, err)
+
+	resp, err := client.HitRaw(&HitRawRequest{
+		Filter: &HitFilter{ID: []string{"hits_test_130_202604_v_1", "Vr0ix9J6f5Wgk3dS"}},
+	})
+	require.NoError(t, err)
+
+	assert.Equal(t, []byte("raw-hit-payload"), resp)
 }
