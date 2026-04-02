@@ -284,8 +284,8 @@ func TestHitRead(t *testing.T) {
 	require.NoError(t, err)
 
 	resp, err := client.HitRead(&HitReadRequest{
-		Filter: HitFilter{
-			ClientID: []int{130},
+		Filter: &HitFilter{
+			ClientID: 130,
 			AttackID: [][]string{{"attacks_test_130_202604_v_1", "3z5nB4P16C7u8Q"}},
 		},
 		Limit:     3,
@@ -294,12 +294,12 @@ func TestHitRead(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	assert.Equal(t, 200, resp.Status)
-	require.Len(t, resp.Body, 1)
-	assert.Equal(t, []string{"hits_test_130_202604_v_1", "Vr0ix9J6f5Wgk3dS"}, resp.Body[0].ID)
-	assert.Equal(t, "11.22.33.45", resp.Body[0].IP)
-	if assert.NotNil(t, resp.Body[0].StatusCode) {
-		assert.Equal(t, 403, *resp.Body[0].StatusCode)
+	require.Len(t, resp, 1)
+	assert.Equal(t, []string{"hits_test_130_202604_v_1", "Vr0ix9J6f5Wgk3dS"}, resp[0].ID)
+	assert.Equal(t, "11.22.33.45", resp[0].IP)
+	assert.Equal(t, 403, resp[0].StatusCode)
+	if assert.NotNil(t, resp[0].RemoteCountry) {
+		assert.Equal(t, "US", *resp[0].RemoteCountry)
 	}
 }
 
