@@ -1,4 +1,4 @@
-module github.com/wallarm/wallarm-go
+module github.com/accessd/wallarm-go
 
 go 1.16
 
