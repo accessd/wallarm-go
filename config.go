@@ -52,6 +52,7 @@ type (
 		WallarmMode
 		RuleSettings
 		ApiSpec
+		SecurityIssues
 	}
 
 	api struct {
