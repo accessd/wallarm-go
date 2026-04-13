@@ -48,6 +48,7 @@ type (
 		CredentialStuffingConfigs
 		SecurityIssues
 		Hits
+		ActivityLog
 	}
 
 	api struct {
