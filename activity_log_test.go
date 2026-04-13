@@ -33,6 +33,7 @@ const activityLogEventsResponseJSON = `{
         "time": 1744531200,
         "action_type": "Create",
         "object_type": "API token",
+        "object_type_info": {"label": "API token", "value": "api_token"},
         "outcome": "success",
         "source": "api_token",
         "client_id": 17,
@@ -134,6 +135,9 @@ func TestActivityLogEventsRead(t *testing.T) {
 	assert.Equal(t, uint64(101), event.ID)
 	assert.Equal(t, "Create", event.ActionType)
 	assert.Equal(t, "API token", event.ObjectType)
+	require.NotNil(t, event.ObjectTypeInfo)
+	assert.Equal(t, "API token", event.ObjectTypeInfo.Label)
+	assert.Equal(t, "api_token", event.ObjectTypeInfo.Value)
 	assert.Equal(t, "success", event.Outcome)
 	assert.Equal(t, "api_token", event.Source)
 	assert.Equal(t, int64(17), event.ClientID)

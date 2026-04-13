@@ -65,21 +65,22 @@ type (
 	}
 
 	ActivityLogEvent struct {
-		ID                uint64            `json:"id"`
-		Time              int64             `json:"time"`
-		ActionType        string            `json:"action_type"`
-		ObjectType        string            `json:"object_type"`
-		Outcome           string            `json:"outcome"`
-		Source            string            `json:"source"`
-		ClientID          int64             `json:"client_id"`
-		Initiator         *ActivityLogActor `json:"initiator,omitempty"`
-		ObjectID          *string           `json:"object_id,omitempty"`
-		Description       *string           `json:"description,omitempty"`
-		ChangedFields     []string          `json:"changed_fields,omitempty"`
-		Diff              json.RawMessage   `json:"diff,omitempty"`
-		StateBeforeAction json.RawMessage   `json:"state_before_action,omitempty"`
-		StateAfterAction  json.RawMessage   `json:"state_after_action,omitempty"`
-		Object            ActivityLogObject `json:"object"`
+		ID                uint64                 `json:"id"`
+		Time              int64                  `json:"time"`
+		ActionType        string                 `json:"action_type"`
+		ObjectType        string                 `json:"object_type"`
+		ObjectTypeInfo    *ActivityLogValueLabel `json:"object_type_info,omitempty"`
+		Outcome           string                 `json:"outcome"`
+		Source            string                 `json:"source"`
+		ClientID          int64                  `json:"client_id"`
+		Initiator         *ActivityLogActor      `json:"initiator,omitempty"`
+		ObjectID          *string                `json:"object_id,omitempty"`
+		Description       *string                `json:"description,omitempty"`
+		ChangedFields     []string               `json:"changed_fields,omitempty"`
+		Diff              json.RawMessage        `json:"diff,omitempty"`
+		StateBeforeAction json.RawMessage        `json:"state_before_action,omitempty"`
+		StateAfterAction  json.RawMessage        `json:"state_after_action,omitempty"`
+		Object            ActivityLogObject      `json:"object"`
 	}
 
 	ActivityLogActor struct {
