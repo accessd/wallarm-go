@@ -12,6 +12,7 @@ import (
 
 const attackResponseJSON = `{
   "status": 200,
+  "cursor": "cursor-2",
   "body": [
     {
       "id": ["attacks_production_2_202603_v_1", "AM5CP50BU-M_02QxawVC"],
@@ -131,6 +132,8 @@ func TestAttackRead(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, 2, req.Limit)
 		assert.Equal(t, "last_time", req.OrderBy)
+		assert.Equal(t, "cursor-1", req.Cursor)
+		assert.True(t, req.Paging)
 
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(attackResponseJSON))
@@ -154,10 +157,13 @@ func TestAttackRead(t *testing.T) {
 		Offset:    0,
 		OrderBy:   "last_time",
 		OrderDesc: true,
+		Cursor:    "cursor-1",
+		Paging:    true,
 	})
 	require.NoError(t, err)
 
 	assert.Equal(t, 200, resp.Status)
+	assert.Equal(t, "cursor-2", resp.Cursor)
 	require.Len(t, resp.Body, 2)
 
 	atk := resp.Body[0]

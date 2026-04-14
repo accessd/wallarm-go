@@ -20,6 +20,8 @@ type (
 		Offset    int           `json:"offset"`
 		OrderBy   string        `json:"order_by"`
 		OrderDesc bool          `json:"order_desc"`
+		Cursor    string        `json:"cursor,omitempty"`
+		Paging    bool          `json:"paging,omitempty"`
 	}
 
 	AttackFilter struct {
@@ -85,6 +87,7 @@ type (
 	AttackReadResp struct {
 		Status int          `json:"status"`
 		Body   []AttackBody `json:"body"`
+		Cursor string       `json:"cursor,omitempty"`
 	}
 
 	AttackCountRequest struct {
