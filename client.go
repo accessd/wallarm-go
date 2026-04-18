@@ -39,10 +39,9 @@ type (
 		ID int `json:"id,omitempty"`
 	}
 
-	// ClientCreate is a root object for updating.
+	// ClientCreate is a root object for creating a tenant.
 	ClientCreate struct {
 		Name        string `json:"name"`
-		VulnPrefix  string `json:"vuln_prefix"`
 		PartnerUUID string `json:"partner_uuid"`
 	}
 
@@ -85,7 +84,6 @@ type (
 		ClientFilter
 		Name             string   `json:"name"`
 		Components       []string `json:"components"`
-		VulnPrefix       string   `json:"vuln_prefix"`
 		SupportPlan      string   `json:"support_plan"`
 		DateFormat       string   `json:"date_format"`
 		BlockingType     string   `json:"blocking_type"`
