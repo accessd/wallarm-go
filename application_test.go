@@ -124,6 +124,50 @@ func TestAppDelete(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestAppRead(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v1/objects/pool", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method)
+		w.Header().Set("content-type", "application/json")
+		fmt.Fprint(w, `{
+			"status": 200,
+			"body": [{
+				"id": 1,
+				"clientid": 8649,
+				"name": "Default",
+				"deleted": false
+			}]
+		}`)
+	})
+
+	res, err := client.AppRead(&AppRead{
+		Limit:  100,
+		Filter: &AppReadFilter{Clientid: []int{8649}},
+	})
+	assert.NoError(t, err)
+	assert.Len(t, res.Body, 1)
+	assert.Equal(t, "Default", res.Body[0].Name)
+}
+
+func TestAppUpdate(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v1/objects/pool/update", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method)
+		w.Header().Set("content-type", "application/json")
+		fmt.Fprint(w, `{"status": 200, "body": null}`)
+	})
+
+	err := client.AppUpdate(&AppUpdate{
+		Filter: &AppUpdateFilter{ID: 1},
+		Fields: &AppUpdateFields{Name: "Updated"},
+	})
+	assert.NoError(t, err)
+}
+
 func TestAppDelete_NonExistent(t *testing.T) {
 	setup()
 	defer teardown()

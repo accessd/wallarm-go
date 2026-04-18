@@ -37,6 +37,19 @@ func TestClientCreate(t *testing.T) {
 	assert.Equal(t, "test-tenant", res.Body.Name)
 }
 
+func TestClientCreate_BadJSON(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v1/objects/client/create", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+		fmt.Fprint(w, `{invalid json}`)
+	})
+
+	_, err := client.ClientCreate(&ClientCreate{Name: "test", PartnerUUID: "uuid"})
+	assert.Error(t, err)
+}
+
 func TestClientCreate_Error(t *testing.T) {
 	setup()
 	defer teardown()
