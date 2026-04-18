@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.9.1
+
+### Breaking Changes
+
+* **Removed `VulnPrefix`** from `ClientCreate` struct and `ClientInfoBody` — the field was removed from the Wallarm API. Sending it causes errors.
+* **Removed `get_vulns.go`** — `Vulnerability` interface and `GetVulnRead` method removed. Unused by the provider.
+
+### Improvements
+
+* **`make lint` target** — added golangci-lint to GNUmakefile.
+* **Test coverage** — added unit tests for Client CRUD, HintRead/Create/Delete, ActionList, DenylistCreate/Delete. Coverage: 25.8% → 36.3%.
+
 ## v0.9.0
 
 ### Features

@@ -1,0 +1,110 @@
+package wallarm
+
+import (
+	"fmt"
+	"net/http"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestHintRead(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v1/objects/hint", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method)
+		w.Header().Set("content-type", "application/json")
+		fmt.Fprint(w, `{
+			"status": 200,
+			"body": [{
+				"id": 100,
+				"actionid": 200,
+				"type": "wallarm_mode",
+				"action": [{"type": "equal", "point": ["header", "HOST"], "value": "example.com"}]
+			}]
+		}`)
+	})
+
+	res, err := client.HintRead(&HintRead{
+		Limit:  1,
+		Filter: &HintFilter{Clientid: []int{8649}, ID: []int{100}},
+	})
+	assert.NoError(t, err)
+	assert.Len(t, *res.Body, 1)
+	assert.Equal(t, 100, (*res.Body)[0].ID)
+	assert.Equal(t, "wallarm_mode", (*res.Body)[0].Type)
+}
+
+func TestHintCreate(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v1/objects/hint/create", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method)
+		w.Header().Set("content-type", "application/json")
+		fmt.Fprint(w, `{
+			"status": 200,
+			"body": {
+				"id": 500,
+				"actionid": 300,
+				"type": "vpatch",
+				"action": []
+			}
+		}`)
+	})
+
+	action := []ActionDetails{}
+	res, err := client.HintCreate(&ActionCreate{
+		Type:     "vpatch",
+		Clientid: 8649,
+		Action:   &action,
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, 500, res.Body.ID)
+	assert.Equal(t, 300, res.Body.ActionID)
+}
+
+func TestHintDelete(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v1/objects/hint/delete", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method)
+		w.Header().Set("content-type", "application/json")
+		fmt.Fprint(w, `{"status": 200, "body": null}`)
+	})
+
+	err := client.HintDelete(&HintDelete{
+		Filter: &HintDeleteFilter{
+			Clientid: []int{8649},
+			ID:       []int{500},
+		},
+	})
+	assert.NoError(t, err)
+}
+
+func TestActionList(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v1/objects/action", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method)
+		w.Header().Set("content-type", "application/json")
+		fmt.Fprint(w, `{
+			"status": 200,
+			"body": [{
+				"id": 1,
+				"conditions": [{"type": "equal", "point": ["header", "HOST"], "value": "test.com"}]
+			}]
+		}`)
+	})
+
+	res, err := client.ActionList(&ActionListParams{
+		Filter: &ActionListFilter{Clientid: []int{8649}},
+		Limit:  10,
+	})
+	assert.NoError(t, err)
+	assert.Len(t, res.Body, 1)
+	assert.Equal(t, 1, res.Body[0].ID)
+}

@@ -36,7 +36,6 @@ type (
 		Graylist
 		Denylist
 		Client
-		Vulnerability
 		Integration
 		Node
 		Trigger
