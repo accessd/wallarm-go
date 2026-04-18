@@ -84,6 +84,75 @@ func TestHintDelete(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestActionReadByID(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v3/action/42", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "GET", r.Method)
+		w.Header().Set("content-type", "application/json")
+		fmt.Fprint(w, `{
+			"status": 200,
+			"body": {
+				"id": 42,
+				"clientid": 8649,
+				"conditions": [{"type": "equal", "point": ["header", "HOST"], "value": "test.com"}]
+			}
+		}`)
+	})
+
+	res, err := client.ActionReadByID(42)
+	assert.NoError(t, err)
+	assert.Equal(t, 42, res.ID)
+}
+
+func TestActionReadByHitID(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v1/objects/action/by_hit", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method)
+		w.Header().Set("content-type", "application/json")
+		fmt.Fprint(w, `{
+			"status": 200,
+			"body": {
+				"conditions": [{"type": "iequal", "point": ["header", "HOST"], "value": "example.com"}],
+				"clientid": 8649
+			}
+		}`)
+	})
+
+	res, err := client.ActionReadByHitID([]string{"abc123"})
+	assert.NoError(t, err)
+	assert.Equal(t, 8649, res.Body.Clientid)
+}
+
+func TestHintUpdateV3(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v3/hint/500", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "PUT", r.Method)
+		w.Header().Set("content-type", "application/json")
+		fmt.Fprint(w, `{
+			"status": 200,
+			"body": {
+				"id": 500,
+				"actionid": 300,
+				"type": "vpatch",
+				"action": []
+			}
+		}`)
+	})
+
+	comment := "updated"
+	res, err := client.HintUpdateV3(500, &HintUpdateV3Params{
+		Comment: &comment,
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, 500, res.Body.ID)
+}
+
 func TestActionList(t *testing.T) {
 	setup()
 	defer teardown()
