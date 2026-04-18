@@ -10,7 +10,7 @@
 ### Improvements
 
 * **`make lint` target** — added golangci-lint to GNUmakefile.
-* **Test coverage** — added unit tests for Client CRUD, HintRead/Create/Delete, ActionList, DenylistCreate/Delete. Coverage: 25.8% → 36.3%.
+* **Test coverage** — added unit tests for all API methods: Client CRUD, Action/Hint CRUD, IP lists (deny/allow/gray), integrations (11 types), triggers, users, API specs, hits, security issues, credential stuffing, wallarm mode, overlimit settings, utils. Coverage: 25.8% → 79.5%.
 
 ## v0.9.0
 
