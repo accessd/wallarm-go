@@ -2,6 +2,7 @@ package wallarm
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -154,6 +155,9 @@ type (
 )
 
 func (api *api) AttackRead(body *AttackReadRequest) (*AttackReadResp, error) {
+	if body == nil {
+		return nil, fmt.Errorf("attack read request is required")
+	}
 	uri := "/v1/objects/attack"
 	respBody, err := api.makeRequest(http.MethodPost, uri, "attack", body,
 		map[string]string{"Content-Type": "application/json"})
@@ -168,6 +172,9 @@ func (api *api) AttackRead(body *AttackReadRequest) (*AttackReadResp, error) {
 }
 
 func (api *api) AttackCount(body *AttackCountRequest) (*AttackCountResp, error) {
+	if body == nil {
+		return nil, fmt.Errorf("attack count request is required")
+	}
 	uri := "/v1/objects/attack/count"
 	respBody, err := api.makeRequest(http.MethodPost, uri, "attack", body,
 		map[string]string{"Content-Type": "application/json"})
@@ -182,6 +189,9 @@ func (api *api) AttackCount(body *AttackCountRequest) (*AttackCountResp, error) 
 }
 
 func (api *api) AttackIP(body *AttackIPRequest) (*AttackIPResp, error) {
+	if body == nil {
+		return nil, fmt.Errorf("attack ip request is required")
+	}
 	uri := "/v1/objects/attack/ip"
 	respBody, err := api.makeRequest(http.MethodPost, uri, "attack", body,
 		map[string]string{"Content-Type": "application/json"})
@@ -196,6 +206,9 @@ func (api *api) AttackIP(body *AttackIPRequest) (*AttackIPResp, error) {
 }
 
 func (api *api) HitDetails(body *HitDetailsRequest) (*HitDetailsResp, error) {
+	if body == nil {
+		return nil, fmt.Errorf("hit details request is required")
+	}
 	uri := "/v1/objects/hit/details"
 	respBody, err := api.makeRequest(http.MethodPost, uri, "attack", body,
 		map[string]string{"Content-Type": "application/json"})
@@ -210,6 +223,9 @@ func (api *api) HitDetails(body *HitDetailsRequest) (*HitDetailsResp, error) {
 }
 
 func (api *api) HitRaw(body *HitRawRequest) ([]byte, error) {
+	if body == nil {
+		return nil, fmt.Errorf("hit raw request is required")
+	}
 	uri := "/v1/objects/hit/raw"
 	return api.makeRequest(http.MethodPost, uri, "attack", body,
 		map[string]string{"Content-Type": "application/json"})

@@ -373,3 +373,28 @@ func TestHitRaw(t *testing.T) {
 
 	assert.Equal(t, []byte("raw-hit-payload"), resp)
 }
+
+func TestAttackMethodsRejectNilRequest(t *testing.T) {
+	client, err := New()
+	require.NoError(t, err)
+
+	respRead, err := client.AttackRead(nil)
+	require.EqualError(t, err, "attack read request is required")
+	assert.Nil(t, respRead)
+
+	respCount, err := client.AttackCount(nil)
+	require.EqualError(t, err, "attack count request is required")
+	assert.Nil(t, respCount)
+
+	respIP, err := client.AttackIP(nil)
+	require.EqualError(t, err, "attack ip request is required")
+	assert.Nil(t, respIP)
+
+	respDetails, err := client.HitDetails(nil)
+	require.EqualError(t, err, "hit details request is required")
+	assert.Nil(t, respDetails)
+
+	respRaw, err := client.HitRaw(nil)
+	require.EqualError(t, err, "hit raw request is required")
+	assert.Nil(t, respRaw)
+}
