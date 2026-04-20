@@ -206,6 +206,9 @@ type (
 )
 
 func (api *api) GetSecurityIssuesRead(body *GetSecurityIssuesRead) ([]*GetSecurityIssuesResp, error) {
+	if body == nil {
+		return nil, fmt.Errorf("security issues read request is required")
+	}
 	request := *body
 	request.Token = api.attackSurfaceToken(request.Token)
 
@@ -222,6 +225,9 @@ func (api *api) GetSecurityIssuesRead(body *GetSecurityIssuesRead) ([]*GetSecuri
 }
 
 func (api *api) GetSecurityIssuesCount(body *GetSecurityIssuesCount) (*GetSecurityIssuesCountResp, error) {
+	if body == nil {
+		return nil, fmt.Errorf("security issues count request is required")
+	}
 	request := *body
 	request.Token = api.attackSurfaceToken(request.Token)
 
@@ -238,6 +244,9 @@ func (api *api) GetSecurityIssuesCount(body *GetSecurityIssuesCount) (*GetSecuri
 }
 
 func (api *api) GetSecurityIssueGroups(body *GetSecurityIssueGroups) ([]*GetSecurityIssueGroupResp, error) {
+	if body == nil {
+		return nil, fmt.Errorf("security issue groups request is required")
+	}
 	request := *body
 	request.Token = api.attackSurfaceToken(request.Token)
 
@@ -254,6 +263,9 @@ func (api *api) GetSecurityIssueGroups(body *GetSecurityIssueGroups) ([]*GetSecu
 }
 
 func (api *api) GetSecurityIssueGroupsCount(body *GetSecurityIssueGroupsCount) (*GetSecurityIssueGroupsCountResp, error) {
+	if body == nil {
+		return nil, fmt.Errorf("security issue groups count request is required")
+	}
 	request := *body
 	request.Token = api.attackSurfaceToken(request.Token)
 
@@ -270,6 +282,9 @@ func (api *api) GetSecurityIssueGroupsCount(body *GetSecurityIssueGroupsCount) (
 }
 
 func (api *api) GetSecurityIssue(body *GetSecurityIssue) (*GetSecurityIssueResp, error) {
+	if body == nil {
+		return nil, fmt.Errorf("security issue request is required")
+	}
 	query := url.Values{}
 	query.Set("client_id", fmt.Sprintf("%d", body.ClientID))
 	query.Set("token", api.attackSurfaceToken(body.Token))

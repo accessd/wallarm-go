@@ -148,3 +148,28 @@ func TestGetSecurityIssueUsesGETQueryTokenAndClientID(t *testing.T) {
 	assert.Equal(t, 101, resp.ID)
 	assert.Equal(t, "demo issue", resp.Description)
 }
+
+func TestSecurityIssueMethodsRejectNilRequest(t *testing.T) {
+	client, err := New()
+	require.NoError(t, err)
+
+	respRead, err := client.GetSecurityIssuesRead(nil)
+	require.EqualError(t, err, "security issues read request is required")
+	assert.Nil(t, respRead)
+
+	respCount, err := client.GetSecurityIssuesCount(nil)
+	require.EqualError(t, err, "security issues count request is required")
+	assert.Nil(t, respCount)
+
+	respGroups, err := client.GetSecurityIssueGroups(nil)
+	require.EqualError(t, err, "security issue groups request is required")
+	assert.Nil(t, respGroups)
+
+	respGroupsCount, err := client.GetSecurityIssueGroupsCount(nil)
+	require.EqualError(t, err, "security issue groups count request is required")
+	assert.Nil(t, respGroupsCount)
+
+	respIssue, err := client.GetSecurityIssue(nil)
+	require.EqualError(t, err, "security issue request is required")
+	assert.Nil(t, respIssue)
+}
