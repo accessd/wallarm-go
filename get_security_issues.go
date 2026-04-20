@@ -162,19 +162,19 @@ type (
 	}
 
 	GetSecurityIssueGroupResp struct {
-		GroupID                 string                `json:"group_id"`
-		Title                   string                `json:"title"`
-		Severity                string                `json:"severity"`
-		DiscoveredBy            string                `json:"discovered_by"`
-		DiscoveredByDisplayName string                `json:"discovered_by_display_name"`
-		IssueType               SecurityIssueType     `json:"issue_type"`
-		SecurityIssuesCount     int                   `json:"security_issues_count"`
-		States                  SecurityIssueStates   `json:"states"`
-		Owasp                   []SecurityIssueOWASP  `json:"owasp"`
-		HostsCount              int                   `json:"hosts_count"`
-		FirstHost               string                `json:"first_host"`
-		ClientID                int                   `json:"client_id"`
-		Tags                    []SecurityIssueTag    `json:"tags"`
+		GroupID                 string               `json:"group_id"`
+		Title                   string               `json:"title"`
+		Severity                string               `json:"severity"`
+		DiscoveredBy            string               `json:"discovered_by"`
+		DiscoveredByDisplayName string               `json:"discovered_by_display_name"`
+		IssueType               SecurityIssueType    `json:"issue_type"`
+		SecurityIssuesCount     int                  `json:"security_issues_count"`
+		States                  SecurityIssueStates  `json:"states"`
+		Owasp                   []SecurityIssueOWASP `json:"owasp"`
+		HostsCount              int                  `json:"hosts_count"`
+		FirstHost               string               `json:"first_host"`
+		ClientID                int                  `json:"client_id"`
+		Tags                    []SecurityIssueTag   `json:"tags"`
 	}
 
 	GetSecurityIssueGroupsCountResp struct {
@@ -183,25 +183,25 @@ type (
 
 	GetSecurityIssueResp struct {
 		GetSecurityIssuesResp
-		Credentials          []string         `json:"credentials"`
-		AdditionalInfo       string           `json:"additional_info"`
-		ExploitationExamples []interface{}    `json:"exploitation_examples"`
-		OOBInteraction       []interface{}    `json:"oob_interaction"`
-		PassiveDetectIncident bool            `json:"passive_detect_incident"`
-		Description          string           `json:"description"`
-		References           []string         `json:"references"`
-		Mitigation           string           `json:"mitigation"`
-		CWE                  []interface{}    `json:"cwe"`
-		RiskInfo             map[string]interface{} `json:"risk_info"`
-		Source               string           `json:"source"`
-		IssueSubtype         map[string]interface{} `json:"issue_subtype"`
-		PassiveDetectURLs    []string         `json:"passive_detect_urls"`
-		Manual               bool             `json:"manual"`
-		LeaksInfo            []interface{}    `json:"leaks_info"`
-		URLActive            bool             `json:"url_active"`
-		StatusHistory        []map[string]interface{} `json:"status_history"`
-		Recheckable          bool             `json:"recheckable"`
-		LastRecheck          map[string]interface{} `json:"last_recheck"`
+		Credentials           []string                 `json:"credentials"`
+		AdditionalInfo        string                   `json:"additional_info"`
+		ExploitationExamples  []interface{}            `json:"exploitation_examples"`
+		OOBInteraction        []interface{}            `json:"oob_interaction"`
+		PassiveDetectIncident bool                     `json:"passive_detect_incident"`
+		Description           string                   `json:"description"`
+		References            []string                 `json:"references"`
+		Mitigation            string                   `json:"mitigation"`
+		CWE                   []interface{}            `json:"cwe"`
+		RiskInfo              map[string]interface{}   `json:"risk_info"`
+		Source                string                   `json:"source"`
+		IssueSubtype          map[string]interface{}   `json:"issue_subtype"`
+		PassiveDetectURLs     []string                 `json:"passive_detect_urls"`
+		Manual                bool                     `json:"manual"`
+		LeaksInfo             []interface{}            `json:"leaks_info"`
+		URLActive             bool                     `json:"url_active"`
+		StatusHistory         []map[string]interface{} `json:"status_history"`
+		Recheckable           bool                     `json:"recheckable"`
+		LastRecheck           map[string]interface{}   `json:"last_recheck"`
 	}
 )
 

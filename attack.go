@@ -1,13 +1,15 @@
 package wallarm
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"net/http"
+)
 
 type (
 	Attack interface {
 		AttackRead(body *AttackReadRequest) (*AttackReadResp, error)
 		AttackCount(body *AttackCountRequest) (*AttackCountResp, error)
 		AttackIP(body *AttackIPRequest) (*AttackIPResp, error)
-		HitRead(body *HitReadRequest) (*HitReadResp, error)
 		HitDetails(body *HitDetailsRequest) (*HitDetailsResp, error)
 		HitRaw(body *HitRawRequest) ([]byte, error)
 	}
@@ -124,41 +126,6 @@ type (
 		Body   []string `json:"body"`
 	}
 
-	HitReadRequest struct {
-		Filter    interface{} `json:"filter"`
-		Limit     int         `json:"limit,omitempty"`
-		Offset    int         `json:"offset,omitempty"`
-		OrderBy   string      `json:"order_by,omitempty"`
-		OrderDesc bool        `json:"order_desc,omitempty"`
-	}
-
-	HitFilter struct {
-		ClientID    []int       `json:"clientid,omitempty"`
-		AttackID    interface{} `json:"attackid,omitempty"`
-		BlockStatus interface{} `json:"block_status,omitempty"`
-		ID          []string    `json:"id,omitempty"`
-	}
-
-	HitBody struct {
-		ID            []string `json:"id"`
-		AttackID      []string `json:"attackid"`
-		Type          string   `json:"type"`
-		IP            string   `json:"ip"`
-		StatusCode    *int     `json:"statuscode"`
-		Time          int      `json:"time"`
-		Value         string   `json:"value"`
-		RemoteCountry *string  `json:"remote_country"`
-		BlockStatus   *string  `json:"block_status"`
-		RequestID     string   `json:"request_id"`
-		Path          string   `json:"path"`
-		Domain        string   `json:"domain"`
-	}
-
-	HitReadResp struct {
-		Status int       `json:"status"`
-		Body   []HitBody `json:"body"`
-	}
-
 	HitDetailsRequest struct {
 		Filter  *HitFilter `json:"filter"`
 		Returns string     `json:"returns,omitempty"`
@@ -188,7 +155,8 @@ type (
 
 func (api *api) AttackRead(body *AttackReadRequest) (*AttackReadResp, error) {
 	uri := "/v1/objects/attack"
-	respBody, err := api.makeRequest("POST", uri, "attack", body)
+	respBody, err := api.makeRequest(http.MethodPost, uri, "attack", body,
+		map[string]string{"Content-Type": "application/json"})
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +169,8 @@ func (api *api) AttackRead(body *AttackReadRequest) (*AttackReadResp, error) {
 
 func (api *api) AttackCount(body *AttackCountRequest) (*AttackCountResp, error) {
 	uri := "/v1/objects/attack/count"
-	respBody, err := api.makeRequest("POST", uri, "attack", body)
+	respBody, err := api.makeRequest(http.MethodPost, uri, "attack", body,
+		map[string]string{"Content-Type": "application/json"})
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +183,8 @@ func (api *api) AttackCount(body *AttackCountRequest) (*AttackCountResp, error) 
 
 func (api *api) AttackIP(body *AttackIPRequest) (*AttackIPResp, error) {
 	uri := "/v1/objects/attack/ip"
-	respBody, err := api.makeRequest("POST", uri, "attack", body)
+	respBody, err := api.makeRequest(http.MethodPost, uri, "attack", body,
+		map[string]string{"Content-Type": "application/json"})
 	if err != nil {
 		return nil, err
 	}
@@ -225,22 +195,10 @@ func (api *api) AttackIP(body *AttackIPRequest) (*AttackIPResp, error) {
 	return &resp, nil
 }
 
-func (api *api) HitRead(body *HitReadRequest) (*HitReadResp, error) {
-	uri := "/v1/objects/hit"
-	respBody, err := api.makeRequest("POST", uri, "attack", body)
-	if err != nil {
-		return nil, err
-	}
-	var resp HitReadResp
-	if err = json.Unmarshal(respBody, &resp); err != nil {
-		return nil, err
-	}
-	return &resp, nil
-}
-
 func (api *api) HitDetails(body *HitDetailsRequest) (*HitDetailsResp, error) {
 	uri := "/v1/objects/hit/details"
-	respBody, err := api.makeRequest("POST", uri, "attack", body)
+	respBody, err := api.makeRequest(http.MethodPost, uri, "attack", body,
+		map[string]string{"Content-Type": "application/json"})
 	if err != nil {
 		return nil, err
 	}
@@ -253,5 +211,6 @@ func (api *api) HitDetails(body *HitDetailsRequest) (*HitDetailsResp, error) {
 
 func (api *api) HitRaw(body *HitRawRequest) ([]byte, error) {
 	uri := "/v1/objects/hit/raw"
-	return api.makeRequest("POST", uri, "attack", body)
+	return api.makeRequest(http.MethodPost, uri, "attack", body,
+		map[string]string{"Content-Type": "application/json"})
 }
